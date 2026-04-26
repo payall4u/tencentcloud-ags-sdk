@@ -12,4 +12,5 @@ examples/juicefs_subpath/juicefs_subpath
 
 # Local env files with real credentials (never commit)
 examples/**/.env.prod
+examples/**/.env.chongqing
 .env.prod
