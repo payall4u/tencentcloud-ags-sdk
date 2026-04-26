@@ -339,9 +339,8 @@ func main() {
 		} else {
 			allMatch = false
 		}
-		fmt.Printf("  [%s] %d 个条目 | 写入=%q 读回=%q | %s\n",
-			r.subPath, len(r.entries), r.writtenTag, r.readBack, tagStatus)
-		_ = names
+		fmt.Printf("  [%s] %d 个条目: %v | 写入=%q 读回=%q | %s\n",
+			r.subPath, len(r.entries), names, r.writtenTag, r.readBack, tagStatus)
 	}
 	fmt.Println()
 	if allMatch {
