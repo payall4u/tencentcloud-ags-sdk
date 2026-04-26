@@ -1,7 +1,14 @@
 # Test code — not part of the SDK distribution
 test/
+juicefs/
 
 # Go build artifacts
 *.exe
 *.test
 *.out
+# compiled example binaries
+examples/juicefs_mount/juicefs_mount
+
+# Local env files with real credentials (never commit)
+examples/**/.env.prod
+.env.prod
