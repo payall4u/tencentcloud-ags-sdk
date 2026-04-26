@@ -7,6 +7,7 @@
 | 目录 | 说明 |
 |------|------|
 | [`juicefs_mount/`](./juicefs_mount/) | 创建挂载 JuiceFS 卷的 Custom 沙箱，并通过 filesystem 客户端验证挂载 |
+| [`juicefs_subpath/`](./juicefs_subpath/) | 启动 10 个实例，每个实例通过 `MountOptions.SubPath` 挂载 JuiceFS 卷中的不同子路径（data_01 ~ data_10） |
 
 ---
 
@@ -193,3 +194,56 @@ go run main.go
 | `Sandbox sdt-xxx is not active` | 工具还在 CREATING | 调用 `waitForToolActive` 等待状态变为 ACTIVE 再启动实例 |
 | `startup command not found` | 命令路径错误 | 确认镜像内可执行文件的完整路径，如 `/usr/bin/envd` |
 | 挂载目录为空（0 条目）| JuiceFS 挂载稍慢 | 使用重试逻辑（示例已内置，最多等待 2 分钟） |
+
+---
+
+## juicefs_subpath — JuiceFS SubPath 子路径挂载
+
+### 功能概述
+
+演示如何在 **启动实例时** 通过 `StartSandboxInstance.MountOptions[].SubPath` 让每个沙箱实例只挂载 JuiceFS 卷中的特定子目录，而无需为每个子路径单独创建沙箱工具。
+
+- 创建 **一个** 共享沙箱工具（整卷挂载）
+- 并发启动 **10 个**实例，分别挂载 `data_01` ~ `data_10`
+- 每个实例在 `AGS_MOUNT_PATH` 下只能看到自己的子目录内容
+
+### 核心用法
+
+```go
+startReq := ags.NewStartSandboxInstanceRequest()
+startReq.ToolId = ptr(toolID)
+startReq.MountOptions = []*ags.MountOption{
+    {
+        Name:    ptr("juicefs-vol"), // 与 StorageMount.Name 一致
+        SubPath: ptr("data_01"),     // 只挂载卷内该子目录
+    },
+}
+```
+
+> `MountOption.Name` 必须与工具定义中 `StorageMount.Name` 完全一致。
+> `MountOption.MountPath` 和 `MountOption.ReadOnly` 可选，不填则继承工具级配置。
+
+### 快速开始
+
+```bash
+cd examples/juicefs_subpath
+source .env.prod   # 或 source .env.example 后填入真实值
+go run main.go
+```
+
+### 预期输出
+
+```
+→ 创建沙箱工具: juicefs-subpath-1714122345
+✅ 工具已创建: id=sdt-xxxxxxxx
+→ 等待工具 ACTIVE ...
+✅ 工具已就绪
+  [data_01] ✅ 实例已启动: si-xxx1
+  [data_02] ✅ 实例已启动: si-xxx2
+  ...
+═══════════════════════════ 结果汇总 ═══════════════════════════
+  [data_01] ✅ 3 个条目: [model.bin config.json README]
+  [data_02] ✅ 2 个条目: [checkpoint.pt metrics.csv]
+  ...
+  [data_10] ✅ 1 个条目: [raw.tar.gz]
+```
