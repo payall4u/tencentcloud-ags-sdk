@@ -8,6 +8,7 @@ juicefs/
 *.out
 # compiled example binaries
 examples/juicefs_mount/juicefs_mount
+examples/juicefs_subpath/juicefs_subpath
 
 # Local env files with real credentials (never commit)
 examples/**/.env.prod
