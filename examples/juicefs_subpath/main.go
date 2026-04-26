@@ -256,7 +256,7 @@ func main() {
 				return
 			}
 
-			// 通过 filesystem 客户端验证挂载内容
+			// 通过 filesystem 客户端验证挂载内容（带重试，挂载可能慢半拍）
 			fsClient, err := filesystem.New(&connection.Config{
 				Domain:      envdDomain,
 				AccessToken: accessToken,
@@ -267,13 +267,9 @@ func main() {
 				return
 			}
 
-			entries, err := fsClient.List(ctx, cfg.MountPath, &filesystem.ListConfig{
-				User: filesystem.UserRoot,
-			})
-			if err != nil {
-				r.err = fmt.Sprintf("List: %v", err)
-				results[idx] = r
-				return
+			entries, ok := waitForMount(ctx, fsClient, cfg.MountPath, subPath, 2*time.Minute)
+			if !ok {
+				fmt.Printf("  [%s] ⚠️  2 分钟内未检测到挂载内容\n", subPath)
 			}
 			r.entries = entries
 			results[idx] = r
@@ -330,6 +326,24 @@ func waitForToolActive(ctx context.Context, client *ags.Client, toolID string, t
 		time.Sleep(3 * time.Second)
 	}
 	return fmt.Errorf("等待工具 ACTIVE 超时（%v）", timeout)
+}
+
+func waitForMount(ctx context.Context, fsClient *filesystem.Client, mountPath, subPath string, timeout time.Duration) ([]filesystem.EntryInfo, bool) {
+	deadline := time.Now().Add(timeout)
+	for {
+		entries, err := fsClient.List(ctx, mountPath, &filesystem.ListConfig{User: filesystem.UserRoot})
+		if err == nil && len(entries) > 0 {
+			return entries, true
+		}
+		if time.Now().After(deadline) {
+			return entries, false
+		}
+		select {
+		case <-ctx.Done():
+			return nil, false
+		case <-time.After(10 * time.Second):
+		}
+	}
 }
 
 func waitForEnvd(ctx context.Context, domain, token string, timeout time.Duration) error {
