@@ -10,8 +10,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -196,6 +198,9 @@ func main() {
 		subPath    string
 		instanceID string
 		entries    []filesystem.EntryInfo
+		writtenTag string // 写入的标识内容
+		readBack   string // 读回的标识内容
+		tagMatch   bool   // 读回内容是否与写入一致
 		err        string
 	}
 
@@ -272,6 +277,38 @@ func main() {
 				fmt.Printf("  [%s] ⚠️  2 分钟内未检测到挂载内容\n", subPath)
 			}
 			r.entries = entries
+
+			// ── 写入桶标识文件，验证 SubPath 隔离是否生效 ──────────────────────
+			// 每个实例向挂载点写入 "bucket_id.txt"，内容为自己的 subPath。
+			// SubPath 正确隔离时：各实例写入各自子目录，互不影响；
+			// SubPath 未生效时：所有实例写同一个文件，后写的覆盖先写的。
+			tagFile := cfg.MountPath + "/bucket_id.txt"
+			tagContent := subPath // e.g. "data_01"
+			r.writtenTag = tagContent
+
+			_, writeErr := fsClient.Write(ctx, tagFile,
+				strings.NewReader(tagContent),
+				&filesystem.WriteConfig{User: filesystem.UserRoot},
+			)
+			if writeErr != nil {
+				fmt.Printf("  [%s] ⚠️  写入标识文件失败: %v\n", subPath, writeErr)
+			} else {
+				// 稍等片刻确保写入刷盘
+				time.Sleep(2 * time.Second)
+				rc, readErr := fsClient.Read(ctx, tagFile,
+					&filesystem.ReadConfig{User: filesystem.UserRoot},
+				)
+				if readErr != nil {
+					fmt.Printf("  [%s] ⚠️  读取标识文件失败: %v\n", subPath, readErr)
+				} else {
+					b, _ := io.ReadAll(rc)
+					r.readBack = string(b)
+					r.tagMatch = r.readBack == tagContent
+					fmt.Printf("  [%s] 标识验证: 写入=%q 读回=%q match=%v\n",
+						subPath, tagContent, r.readBack, r.tagMatch)
+				}
+			}
+
 			results[idx] = r
 		}(i)
 	}
@@ -280,20 +317,37 @@ func main() {
 
 	// ── 5. 汇总输出 ────────────────────────────────────────────────────────────
 	fmt.Println("\n═══════════════════════════ 结果汇总 ═══════════════════════════")
+	allMatch := true
 	for _, r := range results {
 		if r.err != "" {
 			fmt.Printf("  [%s] ❌ %s\n", r.subPath, r.err)
+			allMatch = false
 			continue
 		}
 		if len(r.entries) == 0 {
 			fmt.Printf("  [%s] ⚠️  挂载点为空（子路径不存在或 JuiceFS 挂载失败）\n", r.subPath)
+			allMatch = false
 			continue
 		}
 		names := make([]string, 0, len(r.entries))
 		for _, e := range r.entries {
 			names = append(names, e.Name)
 		}
-		fmt.Printf("  [%s] ✅ %d 个条目: %v\n", r.subPath, len(r.entries), names)
+		tagStatus := "❌ 标识不匹配"
+		if r.tagMatch {
+			tagStatus = "✅ 标识匹配"
+		} else {
+			allMatch = false
+		}
+		fmt.Printf("  [%s] %d 个条目 | 写入=%q 读回=%q | %s\n",
+			r.subPath, len(r.entries), r.writtenTag, r.readBack, tagStatus)
+		_ = names
+	}
+	fmt.Println()
+	if allMatch {
+		fmt.Println("✅ SubPath 隔离验证通过：所有实例读写标识均匹配")
+	} else {
+		fmt.Println("❌ SubPath 隔离验证失败：存在标识不匹配（SubPath 可能未生效，所有实例共享同一挂载根）")
 	}
 }
 
