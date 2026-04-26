@@ -3,9 +3,9 @@ module tencentcloud-ags-sdk/examples/juicefs_mount
 go 1.22
 
 require (
-	git.woa.com/ags/ags-go-sdk v0.0.8
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ags v0.0.0-00010101000000-000000000000
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.85
+	github.com/TencentCloudAgentRuntime/ags-go-sdk v0.1.5
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ags v1.3.81
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.86
 )
 
 require (

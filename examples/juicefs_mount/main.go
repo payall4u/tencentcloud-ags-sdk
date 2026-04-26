@@ -20,9 +20,9 @@ import (
 
 	ags "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ags/v20250920"
 
-	"git.woa.com/ags/ags-go-sdk/connection"
-	"git.woa.com/ags/ags-go-sdk/constant"
-	"git.woa.com/ags/ags-go-sdk/tool/filesystem"
+	"github.com/TencentCloudAgentRuntime/ags-go-sdk/connection"
+	"github.com/TencentCloudAgentRuntime/ags-go-sdk/constant"
+	"github.com/TencentCloudAgentRuntime/ags-go-sdk/tool/filesystem"
 )
 
 // config 持有从环境变量读取的所有运行时配置。

@@ -1,11 +1,12 @@
 connectrpc.com/connect v1.18.1 h1:PAg7CjSAGvscaf6YZKUefjoih5Z/qYkyaTrBW8xvYPw=
 connectrpc.com/connect v1.18.1/go.mod h1:0292hj1rnx8oFrStN7cB4jjVBeqs+Yx5yDIC2prWDO8=
-git.woa.com/ags/ags-go-sdk v0.0.8 h1:N6gpl5wX79QXe5GJ6dSLaseFbXr8NmP4ixHeVd6O4q0=
-git.woa.com/ags/ags-go-sdk v0.0.8/go.mod h1:CUYXYjhm+lPkgCdTAYwES3WhYlaf5cjzgWce8KAuTDA=
+github.com/TencentCloudAgentRuntime/ags-go-sdk v0.1.5 h1:rdAc9HusogDOzFwg7pE4ek4NcDjYkFtVZQbe0TCypJU=
+github.com/TencentCloudAgentRuntime/ags-go-sdk v0.1.5/go.mod h1:AXzrcmmbZcoqr/Bsfda6JwHI8ywocUKBMRZ7OgMIFoM=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.85 h1:Z0jzCnVllzFQhp6J/FzlElevBK0rdPI5YGlVy4NfePE=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.85/go.mod h1:r5r4xbfxSaeR04b166HGsBa/R4U3SueirEUpXGuw+Q0=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.86 h1:86rDQ0y/8CIlylSXdJO3DvglrKxXwtC7/e+YjldrHFs=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.86/go.mod h1:r5r4xbfxSaeR04b166HGsBa/R4U3SueirEUpXGuw+Q0=
 golang.org/x/net v0.23.0 h1:7EYJ93RZ9vYSZAIb2x3lnuvqO5zneoD6IvWjuhfxjTs=
 golang.org/x/net v0.23.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
 golang.org/x/text v0.14.0 h1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=
