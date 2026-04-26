@@ -918,6 +918,17 @@ type ImageStorageSource struct {
 	Digest *string `json:"Digest,omitnil,omitempty" name:"Digest"`
 }
 
+type JuicefsStorageSource struct {
+	// <p>JuiceFS 服务访问地址，支持 http:// 或 https:// 协议，最大 512 字符</p>
+	BaseURL *string `json:"BaseURL,omitnil,omitempty" name:"BaseURL"`
+
+	// <p>JuiceFS 卷名称，最大 128 字符</p>
+	VolumeName *string `json:"VolumeName,omitnil,omitempty" name:"VolumeName"`
+
+	// <p>JuiceFS 访问 Token，最大 256 字符</p>
+	Token *string `json:"Token,omitnil,omitempty" name:"Token"`
+}
+
 type LogConfiguration struct {
 	// <p>日志推送CLS的配置。</p>
 	CLSConfig *CLSConfig `json:"CLSConfig,omitnil,omitempty" name:"CLSConfig"`
@@ -1386,6 +1397,9 @@ type StorageSource struct {
 
 	// <p>文件存储配置</p>
 	Cfs *CfsStorageSource `json:"Cfs,omitnil,omitempty" name:"Cfs"`
+
+	// <p>JuiceFS 存储配置</p>
+	Juicefs *JuicefsStorageSource `json:"JuiceFs,omitnil,omitempty" name:"JuiceFs"`
 }
 
 type Tag struct {

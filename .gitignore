@@ -1,0 +1,7 @@
+# Test code — not part of the SDK distribution
+test/
+
+# Go build artifacts
+*.exe
+*.test
+*.out
